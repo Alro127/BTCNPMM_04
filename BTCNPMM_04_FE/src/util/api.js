@@ -23,8 +23,28 @@ const getUserApi = () => {
     return axios.get(URL_API);
 };
 
+// Lấy danh sách sản phẩm (có phân trang)
+const getProductsApi = (page = 1, limit = 8) => {
+    const URL_API = `/v1/api/products?page=${page}&limit=${limit}`;
+    return axios.get(URL_API);
+};
+
+// Lấy chi tiết 1 sản phẩm theo id
+const getProductByIdApi = (id) => {
+    const URL_API = `/v1/api/products/${id}`;
+    return axios.get(URL_API);
+};
+
+// Thêm sản phẩm mới (chỉ khi đã login có token)
+// const createProductApi = (product) => {
+//     const URL_API = "/v1/api/products/new";
+//     return axios.post(URL_API, product);
+// };
+
 export {
     createUserApi,
     loginApi,
-    getUserApi
+    getUserApi,
+    getProductsApi,
+    getProductByIdApi,
 };
