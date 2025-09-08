@@ -24,10 +24,16 @@ const getUserApi = () => {
 };
 
 // Lấy danh sách sản phẩm (có phân trang)
-const getProductsApi = (page = 1, limit = 8) => {
-    const URL_API = `/v1/api/products?page=${page}&limit=${limit}`;
+const getProductsApi = ({ page = 1, limit = 8, search = "", category = "", minPrice = 0, maxPrice = 999999999 }) => {
+    const URL_API = `/v1/api/products?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&minPrice=${minPrice}&maxPrice=${maxPrice}`;
     return axios.get(URL_API);
 };
+
+export const getCategoriesApi = async () => {
+    const URL_API = "v1/api/products-category"
+    return axios.get(URL_API);
+};
+
 
 // Lấy chi tiết 1 sản phẩm theo id
 const getProductByIdApi = (id) => {
