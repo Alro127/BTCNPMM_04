@@ -1,4 +1,5 @@
 const productService = require('../services/productService');
+const { searchProduct } = require('../services/elasticService');
 
 const getProducts = async (req, res) => {
     try {
@@ -19,6 +20,38 @@ const getProducts = async (req, res) => {
         return res.status(500).json({ message: "Lỗi server" });
     }
 };
+
+const getProductsWithElasticSearch = async (req, res) => {
+    try {
+        const keyword = req.query.q || '';
+        const filters = {
+            priceMin: req.query.priceMin ? Number(req.query.priceMin) : undefined,
+            priceMax: req.query.priceMax ? Number(req.query.priceMax) : undefined,
+            category: req.query.category || undefined
+        };
+
+        const page = req.query.page ? Number(req.query.page) : 1; // trang hiện tại
+        const limit = req.query.limit ? Number(req.query.limit) : 10; // số item mỗi trang
+        const from = (page - 1) * limit;
+
+        const products = await searchProduct(keyword, filters, from, limit);
+
+        res.json({
+            success: true,
+            data: products,
+            pagination: {
+                page,
+                limit,
+                count: products.length
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+}
+
+
 
 const getCategories = async (req, res) => {
     try {
@@ -49,4 +82,4 @@ const createProduct = async (req, res) => {
     }
 };
 
-module.exports = { getProducts, getCategories, getProductById, createProduct };
+module.exports = { getProducts, getProductsWithElasticSearch, getCategories, getProductById, createProduct };

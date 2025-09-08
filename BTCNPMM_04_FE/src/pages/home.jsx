@@ -44,9 +44,9 @@ const HomePage = () => {
                 minPrice: priceRange[0],
                 maxPrice: priceRange[1],
             });
-            if (res && res.products) {
-                setProducts(res.products);
-                setTotal(res.total || 0);
+            if (res && res.success) {
+                setProducts(res.data || []);
+                setTotal(res.pagination?.count || 0);
             } else {
                 setProducts([]);
                 setTotal(0);
