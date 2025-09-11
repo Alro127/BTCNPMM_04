@@ -26,6 +26,7 @@ const getUserApi = () => {
 // Lấy danh sách sản phẩm (có phân trang)
 const getProductsApi = ({ page = 1, limit = 8, search = "", category = "", minPrice = 0, maxPrice = 999999999 }) => {
     const URL_API = `/v1/api/products?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&minPrice=${minPrice}&maxPrice=${maxPrice}`;
+    console.log(URL_API);
     return axios.get(URL_API);
 };
 

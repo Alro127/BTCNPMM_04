@@ -13,8 +13,17 @@ mongoose.connect(process.env.MONGO_DB_URL, {
     .catch(err => console.error('MongoDB connection error:', err));
 
 // ================= Elasticsearch =================
-const client = new Client({ node: 'http://localhost:9200' });
+const client = new Client({
+    node: 'https://127.0.0.1:9200',
 
+    auth: {
+        username: 'elastic',
+        password: '77+fZMPtphQKfAIW*IVj'  // 👈 Mật khẩu bạn reset
+    },
+    tls: {
+        rejectUnauthorized: false  // 👈 Bỏ qua self-signed cert
+    }
+});
 // Tạo index products nếu chưa tồn tại
 async function ensureIndex() {
     const exists = await client.indices.exists({ index: 'products' });

@@ -1,7 +1,14 @@
 const { Client } = require('@elastic/elasticsearch');
 const client = new Client({
-  node: 'http://localhost:9200',
-  apiVersionCompatibility: true // client sẽ gửi đúng header compatible-with=8
+  node: 'https://127.0.0.1:9200',
+
+  auth: {
+    username: 'elastic',
+    password: '77+fZMPtphQKfAIW*IVj'  // 👈 Mật khẩu bạn reset
+  },
+  tls: {
+    rejectUnauthorized: false  // 👈 Bỏ qua self-signed cert
+  }
 });
 
 
@@ -48,6 +55,9 @@ async function searchProduct(keyword, filters = {}, from = 0, size = 10) {
     }
   };
 
+  console.log(">>> filters:", filters);
+
+
   const result = await client.search({
     index: 'products',
     from,
@@ -55,7 +65,14 @@ async function searchProduct(keyword, filters = {}, from = 0, size = 10) {
     query
   });
 
-  return result.hits.hits.map(hit => hit._source);
+  return {
+    hits: result.hits.hits.map(hit => ({
+      id: hit._id,
+      ...hit._source
+    })),
+    total: result.hits.total.value, // ✅ Tổng số lượng match
+  };
 }
+
 
 module.exports = { searchProduct };

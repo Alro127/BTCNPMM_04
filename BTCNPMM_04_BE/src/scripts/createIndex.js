@@ -1,7 +1,15 @@
 // createIndex.js
 const { Client } = require('@elastic/elasticsearch');
-const client = new Client({ node: 'http://localhost:9200' });
-
+const client = new Client({
+    node: 'https://127.0.0.1:9200',
+    auth: {
+        username: 'elastic',
+        password: '77+fZMPtphQKfAIW*IVj'  // 👈 Mật khẩu bạn reset
+    },
+    tls: {
+        rejectUnauthorized: false  // 👈 Bỏ qua self-signed cert
+    }
+});
 async function createIndex() {
     const { body: exists } = await client.indices.exists({ index: 'products' });
     if (!exists) {

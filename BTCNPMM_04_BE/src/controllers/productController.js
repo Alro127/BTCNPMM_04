@@ -22,34 +22,38 @@ const getProducts = async (req, res) => {
 };
 
 const getProductsWithElasticSearch = async (req, res) => {
+    console.log(">>> Controller hit: getProductsWithElasticSearch");
     try {
-        const keyword = req.query.q || '';
+        const keyword = req.query.search || '';  // 🟢 dùng "search" từ FE
         const filters = {
-            priceMin: req.query.priceMin ? Number(req.query.priceMin) : undefined,
-            priceMax: req.query.priceMax ? Number(req.query.priceMax) : undefined,
+            priceMin: req.query.minPrice ? Number(req.query.minPrice) : undefined,
+            priceMax: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
             category: req.query.category || undefined
         };
 
-        const page = req.query.page ? Number(req.query.page) : 1; // trang hiện tại
-        const limit = req.query.limit ? Number(req.query.limit) : 10; // số item mỗi trang
+
+
+        const page = req.query.page ? Number(req.query.page) : 1;
+        const limit = req.query.limit ? Number(req.query.limit) : 10;
         const from = (page - 1) * limit;
 
-        const products = await searchProduct(keyword, filters, from, limit);
+        const result = await searchProduct(keyword, filters, from, limit);
 
         res.json({
             success: true,
-            data: products,
+            data: result.hits,
             pagination: {
                 page,
                 limit,
-                count: products.length
+                count: result.total // ✅ đúng tổng số lượng sản phẩm
             }
         });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server Error' });
     }
-}
+};
+
 
 
 
