@@ -23,7 +23,7 @@ const getProducts = async ({ page = 1, limit = 8, search = "", category, minPric
     if (search) {
         const fuse = new Fuse(allProducts, {
             keys: ["name", "description"], // tìm trong name + description
-            threshold: 0.4,                // 0 = strict, 1 = fuzzy rộng
+            threshold: 0.4,               
         });
         const results = fuse.search(search);
         filteredProducts = results.map(r => r.item);

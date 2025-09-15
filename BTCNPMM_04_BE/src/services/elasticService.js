@@ -4,10 +4,10 @@ const client = new Client({
 
   auth: {
     username: 'elastic',
-    password: '77+fZMPtphQKfAIW*IVj'  // 👈 Mật khẩu bạn reset
+    password: '77+fZMPtphQKfAIW*IVj'
   },
   tls: {
-    rejectUnauthorized: false  // 👈 Bỏ qua self-signed cert
+    rejectUnauthorized: false
   }
 });
 
@@ -27,7 +27,8 @@ async function searchProduct(keyword, filters = {}, from = 0, size = 10) {
     must.push({
       multi_match: {
         query: keyword,
-        fields: ['name', 'description']
+        fields: ['name', 'description'],
+        fuzziness: "1"
       }
     });
   }

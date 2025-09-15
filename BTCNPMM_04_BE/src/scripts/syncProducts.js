@@ -18,10 +18,10 @@ const client = new Client({
 
     auth: {
         username: 'elastic',
-        password: '77+fZMPtphQKfAIW*IVj'  // 👈 Mật khẩu bạn reset
+        password: '77+fZMPtphQKfAIW*IVj' 
     },
     tls: {
-        rejectUnauthorized: false  // 👈 Bỏ qua self-signed cert
+        rejectUnauthorized: false  
     }
 });
 // Tạo index products nếu chưa tồn tại

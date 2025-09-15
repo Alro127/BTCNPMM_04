@@ -24,7 +24,7 @@ const getProducts = async (req, res) => {
 const getProductsWithElasticSearch = async (req, res) => {
     console.log(">>> Controller hit: getProductsWithElasticSearch");
     try {
-        const keyword = req.query.search || '';  // 🟢 dùng "search" từ FE
+        const keyword = req.query.search || '';
         const filters = {
             priceMin: req.query.minPrice ? Number(req.query.minPrice) : undefined,
             priceMax: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
@@ -45,7 +45,7 @@ const getProductsWithElasticSearch = async (req, res) => {
             pagination: {
                 page,
                 limit,
-                count: result.total // ✅ đúng tổng số lượng sản phẩm
+                count: result.total 
             }
         });
     } catch (err) {

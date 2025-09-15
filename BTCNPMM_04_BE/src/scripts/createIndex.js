@@ -4,10 +4,10 @@ const client = new Client({
     node: 'https://127.0.0.1:9200',
     auth: {
         username: 'elastic',
-        password: '77+fZMPtphQKfAIW*IVj'  // 👈 Mật khẩu bạn reset
+        password: '77+fZMPtphQKfAIW*IVj'  
     },
     tls: {
-        rejectUnauthorized: false  // 👈 Bỏ qua self-signed cert
+        rejectUnauthorized: false 
     }
 });
 async function createIndex() {
