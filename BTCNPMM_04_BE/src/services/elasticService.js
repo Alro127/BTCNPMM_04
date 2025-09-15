@@ -28,7 +28,7 @@ async function searchProduct(keyword, filters = {}, from = 0, size = 10) {
       multi_match: {
         query: keyword,
         fields: ['name', 'description'],
-        fuzziness: "1"
+        fuzziness: 'AUTO'
       }
     });
   }
@@ -71,7 +71,7 @@ async function searchProduct(keyword, filters = {}, from = 0, size = 10) {
       id: hit._id,
       ...hit._source
     })),
-    total: result.hits.total.value, // ✅ Tổng số lượng match
+    total: result.hits.total.value,
   };
 }
 
