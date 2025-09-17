@@ -1,7 +1,7 @@
 // syncProducts.js
-require('dotenv').config(); // đọc file .env
+require('dotenv').config();
 const mongoose = require('mongoose');
-const Product = require('../models/product'); // đường dẫn tới file model Product của bạn
+const Product = require('../models/product');
 const { Client } = require('@elastic/elasticsearch');
 
 // ================= MongoDB =================
@@ -9,48 +9,62 @@ mongoose.connect(process.env.MONGO_DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+    .then(() => console.log('✅ Connected to MongoDB'))
+    .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // ================= Elasticsearch =================
 const client = new Client({
     node: 'https://127.0.0.1:9200',
-
     auth: {
         username: 'elastic',
-        password: '77+fZMPtphQKfAIW*IVj' 
+        password: '77+fZMPtphQKfAIW*IVj' // ⚠️ thay bằng password thật
     },
     tls: {
-        rejectUnauthorized: false  
+        rejectUnauthorized: false
     }
 });
-// Tạo index products nếu chưa tồn tại
+
+// Đảm bảo index tồn tại trước khi đồng bộ
 async function ensureIndex() {
     const exists = await client.indices.exists({ index: 'products' });
 
-    // exists.body === true nếu index tồn tại
     if (!exists) {
+        console.log('🔧 Index "products" chưa tồn tại → tạo mới...');
         await client.indices.create({
             index: 'products',
             body: {
+                settings: {
+                    analysis: {
+                        analyzer: {
+                            product_name_analyzer: {
+                                type: "custom",
+                                tokenizer: "standard",
+                                filter: ["lowercase", "asciifolding"]
+                            }
+                        }
+                    }
+                },
                 mappings: {
                     properties: {
-                        name: { type: 'text' },
+                        name: { type: 'text', analyzer: 'product_name_analyzer' },
                         description: { type: 'text' },
                         price: { type: 'float' },
                         category: { type: 'keyword' },
-                        image: { type: 'text' },
-                        stock: { type: 'integer' }
+                        images: { type: 'keyword' },
+                        stock: { type: 'integer' },
+                        views: { type: 'integer' },
+                        buyers: { type: 'integer' },
+                        createdAt: { type: 'date' },
+                        updatedAt: { type: 'date' }
                     }
                 }
             }
         });
-        console.log('Tạo index "products" thành công');
+        console.log('✅ Đã tạo index "products" thành công');
     } else {
-        console.log('Index "products" đã tồn tại');
+        console.log('ℹ️ Index "products" đã tồn tại');
     }
 }
-
 
 // Đồng bộ dữ liệu từ MongoDB sang Elasticsearch
 async function syncProducts() {
@@ -58,30 +72,45 @@ async function syncProducts() {
         await ensureIndex();
 
         const products = await Product.find();
-        console.log(`Tìm thấy ${products.length} sản phẩm trong MongoDB`);
+        console.log(`📦 Tìm thấy ${products.length} sản phẩm trong MongoDB`);
+
+        const operations = [];
 
         for (const p of products) {
-            await client.index({
-                index: 'products',
-                id: p._id.toString(),
-                document: {
-                    name: p.name,
-                    description: p.description,
-                    price: p.price,
-                    category: p.category,
-                    image: p.image,
-                    stock: p.stock
-                }
+            operations.push({
+                index: { _index: 'products', _id: p._id.toString() }
             });
-            console.log(`Đã đồng bộ product ${p._id}`);
+            operations.push({
+                name: p.name,
+                description: p.description || '',
+                price: p.price,
+                category: p.category || '',
+                images: p.images || [],
+                stock: p.stock,
+                views: p.stats?.views || 0,
+                buyers: p.stats?.buyers || 0,
+                createdAt: p.createdAt,
+                updatedAt: p.updatedAt
+            });
         }
 
-        await client.indices.refresh({ index: 'products' });
-        console.log('Đã đồng bộ tất cả products sang Elasticsearch');
+        if (operations.length > 0) {
+            const bulkResponse = await client.bulk({ refresh: true, operations });
+
+            if (bulkResponse.errors) {
+                console.error('❌ Một số documents bị lỗi khi đồng bộ:', bulkResponse.items);
+            } else {
+                console.log(`✅ Đồng bộ ${products.length} sản phẩm sang Elasticsearch thành công`);
+            }
+        } else {
+            console.log('⚠️ Không có sản phẩm nào để đồng bộ');
+        }
+
     } catch (err) {
-        console.error('Lỗi khi đồng bộ products:', err);
+        console.error('❌ Lỗi khi đồng bộ products:', err.meta?.body?.error || err);
     } finally {
-        mongoose.disconnect();
+        await mongoose.disconnect();
+        console.log('🔌 Đã đóng kết nối MongoDB');
     }
 }
 

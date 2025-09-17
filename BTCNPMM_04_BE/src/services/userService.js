@@ -48,15 +48,20 @@ const loginService = async (email, password) => {
             } else {
                 // create an access token
                 const payload = {
+                    _id: user._id,
                     email: user.email,
                     name: user.name
                 };
 
+                const expiresInSeconds = parseInt(process.env.JWT_EXPIRES_IN, 10);
+
                 const access_token = jwt.sign(
                     payload,
                     process.env.JWT_SECRET,
-                    { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
+                    { expiresIn: expiresInSeconds || "1h" }
                 );
+
+                console.log(">>> JWT_EXPIRES_IN env:", process.env.JWT_EXPIRES_IN);
 
 
                 return {
