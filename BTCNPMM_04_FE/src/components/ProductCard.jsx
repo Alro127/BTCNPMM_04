@@ -34,6 +34,8 @@ const ProductCard = ({ product, isViewed = false, isFavourite = false }) => {
         }
     };
 
+    console.log("is Viewed: ", isViewed);
+
     return (
         <Badge.Ribbon text={isOnSale ? "SALE" : ""} color={isOnSale ? "red" : "blue"}>
             <Link to={`/product/${product._id || product.id}`}>

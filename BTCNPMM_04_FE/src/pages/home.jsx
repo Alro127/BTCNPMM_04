@@ -36,6 +36,8 @@ const HomePage = () => {
                 setRecentViews(recentViewsRes.recentViews || []);
             }
 
+            console.log("Recent Views:", recentViewsRes?.recentViews);
+
             const favouritesRes = await getFavouritesApi();
             if (favouritesRes?.success) {
                 setFavourites(favouritesRes.favourites || []);

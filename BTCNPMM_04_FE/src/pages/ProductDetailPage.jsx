@@ -7,6 +7,7 @@ import ProductImages from "../components/ProductImages";
 import ProductStats from "../components/ProductStats";
 import CommentList from "../components/CommentList";
 import CommentForm from "../components/CommentForm";
+import ProductCard from "../components/ProductCard";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -192,28 +193,7 @@ const ProductDetailPage = () => {
                     <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 16 }}>
                         {similarProducts.length > 0 ? (
                             similarProducts.map((item) => (
-                                <Card
-                                    key={item._id}
-                                    hoverable
-                                    size="small"
-                                    style={{ borderRadius: 12 }}
-                                    cover={
-                                        <img
-                                            src={item.image[0] || "https://via.placeholder.com/150x120?text=No+Image"}
-                                            alt={item.name}
-                                            style={{ height: 120, objectFit: "cover", borderRadius: "12px 12px 0 0" }}
-                                        />
-                                    }
-                                >
-                                    <Card.Meta
-                                        title={item.name}
-                                        description={
-                                            <span style={{ color: "#52c41a", fontWeight: 600 }}>
-                                                {item.price.toLocaleString()}₫
-                                            </span>
-                                        }
-                                    />
-                                </Card>
+                                <ProductCard key={item._id || item.id} product={item} />
                             ))
                         ) : (
                             <Text type="secondary">Không có sản phẩm tương tự</Text>

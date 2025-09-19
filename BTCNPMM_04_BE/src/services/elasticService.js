@@ -66,7 +66,7 @@ async function searchProduct(keyword, filters = {}, from = 0, size = 10) {
 
   return {
     hits: result.hits.hits.map(hit => ({
-      id: hit._id,
+      _id: hit._id,
       ...hit._source
     })),
     total: result.hits.total.value,
